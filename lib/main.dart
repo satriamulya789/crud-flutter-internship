@@ -1,8 +1,8 @@
 import 'package:crud/models/user_login_model.dart';
-import 'package:crud/pages/local_user.dart';
 import 'package:crud/pages/login_page.dart';
 import 'package:crud/pages/register_page.dart';
 import 'package:crud/pages/welcome_page.dart';
+import 'package:crud/widgets/local_users_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/welcome', page: () => const WelcomePage()),
         GetPage(name: '/login', page: () => const LoginPage()),
         GetPage(name: '/register', page: () => const RegisterPage()),
-        GetPage(name: '/local_users', page: () => const LocalUsers()),
+        GetPage(name: '/local_users', page: () => const LocalUsersTab()),
       ],
     );
   }

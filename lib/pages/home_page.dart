@@ -32,6 +32,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> _showAddDialog() async {
     if (_selectedTab == 0) {
       await UserDialogs.showAddRemoteDialog(context, controller);
+    } else {
+      await UserDialogs.showAddLocalDialog(context, controller);
     }
   }
 
@@ -96,27 +98,61 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(
-              onPressed: () {
+            InkWell(
+              onTap: () {
                 setState(() => _selectedTab = 0);
               },
-              icon: Icon(
-                Icons.cloud,
-                color: _selectedTab == 0 ? Colors.deepPurple : Colors.grey,
-                size: 30,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.cloud,
+                    color: _selectedTab == 0 ? Colors.deepPurple : Colors.grey,
+                    size: 30,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Remote',
+                    style: TextStyle(
+                      color: _selectedTab == 0
+                          ? Colors.deepPurple
+                          : Colors.grey,
+                      fontSize: 12,
+                      fontWeight: _selectedTab == 0
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ],
               ),
-              tooltip: 'Remote Users',
             ),
-            IconButton(
-              onPressed: () {
+            InkWell(
+              onTap: () {
                 setState(() => _selectedTab = 1);
               },
-              icon: Icon(
-                Icons.person,
-                color: _selectedTab == 1 ? Colors.deepPurple : Colors.grey,
-                size: 30,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.person,
+                    color: _selectedTab == 1 ? Colors.deepPurple : Colors.grey,
+                    size: 30,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Local',
+                    style: TextStyle(
+                      color: _selectedTab == 1
+                          ? Colors.deepPurple
+                          : Colors.grey,
+                      fontSize: 12,
+                      fontWeight: _selectedTab == 1
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ],
               ),
-              tooltip: 'Local Users',
             ),
           ],
         ),

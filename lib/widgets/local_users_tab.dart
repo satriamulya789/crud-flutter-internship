@@ -1,8 +1,10 @@
 import 'package:crud/controllers/home_controller.dart';
 import 'package:crud/models/user_login_model.dart';
-import 'package:crud/pages/register_page.dart';
+import 'package:crud/pages/login_page.dart';
+import 'package:crud/widgets/user_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class LocalUsersTab extends StatefulWidget {
   const LocalUsersTab({super.key});
@@ -26,198 +28,61 @@ class _LocalUsersTabState extends State<LocalUsersTab> {
     setState(() {});
   }
 
+  String _formatLastEdited(DateTime? lastEdited) {
+    if (lastEdited == null) return 'Never edited';
+    final formatter = DateFormat('dd MMM yyyy, HH:mm');
+    return 'Edited: ${formatter.format(lastEdited)}';
+  }
+
   Future<void> _showAddDialog() async {
-    final usernameCtrl = TextEditingController();
-    final passwordCtrl = TextEditingController();
-
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Add local user'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: usernameCtrl,
-              decoration: const InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: passwordCtrl,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final u = usernameCtrl.text.trim();
-              final p = passwordCtrl.text;
-              if (u.isEmpty || p.isEmpty) return;
-
-              // Gunakan controller untuk cek dan simpan
-              final existingUser = await controller.getUser(u);
-              if (existingUser != null) {
-                if (ctx.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Username already exists')),
-                  );
-                }
-                return;
-              }
-
-              await controller.addUser(User(username: u, password: p));
-
-              if (ctx.mounted) Navigator.of(ctx).pop();
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
-    );
+    await UserDialogs.showAddLocalDialog(context, controller);
   }
 
   Future<void> _showEditDialog(User user) async {
-    final usernameCtrl = TextEditingController(text: user.username);
-    final passwordCtrl = TextEditingController(text: user.password);
-
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Edit user'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: usernameCtrl,
-              decoration: const InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: passwordCtrl,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final newU = usernameCtrl.text.trim();
-              final newP = passwordCtrl.text;
-              if (newU.isEmpty || newP.isEmpty) return;
-
-              try {
-                // Gunakan controller untuk update
-                await controller.updateUser(
-                  user.username,
-                  User(username: newU, password: newP),
-                );
-
-                if (ctx.mounted) {
-                  Navigator.of(ctx).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('User updated successfully')),
-                  );
-                }
-              } catch (e) {
-                if (ctx.mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(e.toString())));
-                }
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
+    await UserDialogs.showEditLocalDialog(context, controller, user);
   }
 
   Future<void> _confirmDelete(String username) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete user'),
-        content: Text('Delete user "$username"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
+    await UserDialogs.confirmDeleteLocal(context, controller, username);
 
-    if (ok == true) {
-      // Cek apakah user yang dihapus adalah current user
-      final isCurrentUser = username == _currentUsername;
-
-      // Gunakan controller untuk hapus
-      await controller.deleteUser(username);
-
+    // Setelah delete, cek apakah user yang dihapus adalah current user
+    final currentUsername = await controller.getLoginSession();
+    if (currentUsername == null && _currentUsername == username) {
+      // User yang login telah dihapus
       if (mounted) {
-        if (isCurrentUser) {
-          // Jika current user yang dihapus, tampilkan error dialog
-          await showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (ctx) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              title: Row(
-                children: const [
-                  Icon(Icons.error_outline, color: Colors.red, size: 28),
-                  SizedBox(width: 8),
-                  Text('Error Data'),
-                ],
-              ),
-              content: const Text(
-                'Akun Anda telah dihapus dari database lokal. Anda akan logout otomatis.',
-                style: TextStyle(fontSize: 16),
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            title: Row(
+              children: const [
+                Icon(Icons.error_outline, color: Colors.red, size: 28),
+                SizedBox(width: 8),
+                Text('Error Data'),
               ],
             ),
-          );
-
-          // Logout otomatis menggunakan controller
-          await controller.clearLoginSession();
-
-          if (mounted) {
-            Get.offAll(() => const RegisterPage());
-          }
-        } else {
-          // User biasa berhasil dihapus
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('User deleted successfully'),
-              backgroundColor: Colors.orange,
+            content: const Text(
+              'Akun Anda telah dihapus dari database lokal. Anda akan logout otomatis.',
+              style: TextStyle(fontSize: 16),
             ),
-          );
-        }
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text('OK', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        );
+
+        Get.offAll(() => const LoginPage());
       }
+    } else {
+      // Refresh current username jika perlu
+      await _loadCurrentUser();
     }
   }
 
@@ -254,16 +119,16 @@ class _LocalUsersTabState extends State<LocalUsersTab> {
             return ListTile(
               leading: const CircleAvatar(child: Icon(Icons.person)),
               title: Text(lu.username),
-              subtitle: const Text('local'),
+              subtitle: Text(_formatLastEdited(lu.lastEdited)),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit),
+                    icon: const Icon(Icons.edit, color: Colors.blue),
                     onPressed: () => _showEditDialog(lu),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete),
+                    icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () => _confirmDelete(lu.username),
                   ),
                 ],

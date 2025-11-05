@@ -11,9 +11,7 @@ class HomeController extends GetxController {
   final error = ''.obs;
 
   // Dio instance
-  final Dio dio = Dio(
-    BaseOptions(baseUrl: ''),
-  );
+  final Dio dio = Dio(BaseOptions(baseUrl: 'https://690067a3ff8d792314b9a525.mockapi.io'));
 
   // Local users
   final localUsers = <User>[].obs;
@@ -31,7 +29,7 @@ class HomeController extends GetxController {
     fetchLocalUsers();
   }
 
-  // ============= REMOTE USERS (API) =============
+  //  REMOTE USERS (API) 
 
   /// Fetch all remote users from API
   Future<void> fetchUsers() async {
@@ -115,7 +113,7 @@ class HomeController extends GetxController {
     }
   }
 
-  // ============= LOCAL USERS (HIVE) =============
+  // LOCAL USERS (HIVE) 
 
   /// Fetch all local users from Hive
   Future<void> fetchLocalUsers() async {

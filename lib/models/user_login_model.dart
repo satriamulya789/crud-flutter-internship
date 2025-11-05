@@ -10,5 +10,8 @@ class User extends HiveObject {
   @HiveField(1)
   String password;
 
-  User({required this.username, required this.password});
+  @HiveField(2)
+  DateTime? lastEdited;
+
+  User({required this.username, required this.password, this.lastEdited});
 }
