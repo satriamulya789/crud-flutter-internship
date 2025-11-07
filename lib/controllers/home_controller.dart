@@ -11,7 +11,7 @@ class HomeController extends GetxController {
   final error = ''.obs;
 
   // Dio instance
-  final Dio dio = Dio(BaseOptions(baseUrl: 'https://690067a3ff8d792314b9a525.mockapi.io'));
+  final Dio dio = Dio(BaseOptions(baseUrl: ''));
 
   // Local users
   final localUsers = <User>[].obs;
