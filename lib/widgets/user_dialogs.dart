@@ -218,6 +218,7 @@ class UserDialogs {
       ),
     );
   }
+  
 
   static Future<void> confirmDeleteRemote(
     BuildContext context,

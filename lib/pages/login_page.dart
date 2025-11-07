@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
 
   @override
-  void dispose(){
+  void dispose() {
     _usernameCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.green,
         ),
       );
-      
+
       // Navigasi ke HomePage dan hapus semua route sebelumnya
       Get.offAll(() => const HomePage());
     } else {
@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Get.back();
+            Get.toNamed('/welcome');
           },
         ),
       ),
@@ -98,11 +98,7 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                const Icon(
-                  Icons.login,
-                  size: 80,
-                  color: Colors.deepPurple,
-                ),
+                const Icon(Icons.login, size: 80, color: Colors.deepPurple),
                 const SizedBox(height: 20),
                 const Text(
                   'Welcome Back!',
@@ -154,7 +150,9 @@ class _LoginPageState extends State<LoginPage> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                       ),
                       onPressed: () {
                         setState(() {
@@ -185,6 +183,24 @@ class _LoginPageState extends State<LoginPage> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Get.toNamed('/forgot-password');
+                      },
+                      child: const Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          color: Colors.deepPurple,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 SizedBox(

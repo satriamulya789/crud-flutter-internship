@@ -1,4 +1,5 @@
 import 'package:crud/models/user_login_model.dart';
+import 'package:crud/pages/forgot_password.dart';
 import 'package:crud/pages/login_page.dart';
 import 'package:crud/pages/register_page.dart';
 import 'package:crud/pages/welcome_page.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/login', page: () => const LoginPage()),
         GetPage(name: '/register', page: () => const RegisterPage()),
         GetPage(name: '/local_users', page: () => const LocalUsersTab()),
+        GetPage(name: '/forgot-password', page: () => const ForgotPassword()),
       ],
     );
   }

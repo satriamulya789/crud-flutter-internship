@@ -28,7 +28,7 @@ class HomeController extends GetxController {
     fetchUsers();
     fetchLocalUsers();
   }
-
+ //TODO: add lupa pw
   //  REMOTE USERS (API) 
 
   /// Fetch all remote users from API
